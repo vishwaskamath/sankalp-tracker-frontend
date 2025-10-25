@@ -8,7 +8,7 @@ function LandingPage() {
   return (
     <div className="App">
       <nav className="navbar">
-        <h1 className="logo">Sankalp - start your sankalp today!</h1>
+        <h1 className="logo" style={{color:"#0078ff"}}>Sankalp - start your sankalp today!</h1>
       </nav>
 
       <section className="hero">

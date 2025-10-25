@@ -15,20 +15,22 @@ function Tracker() {
     if (!newActivity.trim()) return;
     const updated = { ...activities };
     if (!updated[today]) updated[today] = [];
-    updated[today].push(newActivity.trim());
+    updated[today].push({ text: newActivity.trim(), done: false });
     setActivities(updated);
     setNewActivity("");
     setShowModal(false);
   };
 
-  const sortedDates = Object.keys(activities).sort(
-    (a, b) => new Date(b) - new Date(a)
-  );
+  const toggleDone = (index) => {
+    const updated = { ...activities };
+    updated[today][index].done = !updated[today][index].done;
+    setActivities(updated);
+  };
 
   return (
     <div className="tracker-container">
       <header className="tracker-header">
-        <h1>Sankalp – Daily Activities</h1>
+        <h1 style={{ color: "#0078ff" }}>Sankalp - Daily Activities</h1>
         <div className="header-actions">
           <button className="add-btn" onClick={() => setShowModal(true)}>
             + Add Activity
@@ -44,12 +46,14 @@ function Tracker() {
         <div className="modal-overlay">
           <div className="modal">
             <h2>Add Activity for {today}</h2>
-            <input
-              type="text"
-              value={newActivity}
-              onChange={(e) => setNewActivity(e.target.value)}
-              placeholder="What do you want to do today?"
-            />
+            <div className="input-wrapper">
+              <input
+                type="text"
+                value={newActivity}
+                onChange={(e) => setNewActivity(e.target.value)}
+                placeholder="What do you want to do today?"
+              />
+            </div>
             <div className="modal-actions">
               <button onClick={addActivity}>Add</button>
               <button className="cancel" onClick={() => setShowModal(false)}>
@@ -62,24 +66,28 @@ function Tracker() {
 
       {/* Cards */}
       <div className="cards-container">
-        {sortedDates.length === 0 ? (
+        {activities[today] && activities[today].length > 0 ? (
+          <div className="day-card">
+            <h3>{today}</h3>
+            <ul>
+              {activities[today].map((act, i) => (
+                <li
+                  key={i}
+                  className={`task-item ${act.done ? "done-task" : ""}`}
+                  onClick={() => toggleDone(i)}
+                >
+                  <span>{act.text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
           <div className="empty-state">
             <p>No activities added yet.</p>
             <p>
               Click <strong>+ Add Activity</strong> to start tracking your day!
             </p>
           </div>
-        ) : (
-          sortedDates.map((date) => (
-            <div key={date} className="day-card">
-              <h3>{date}</h3>
-              <ul>
-                {activities[date].map((act, i) => (
-                  <li key={i}>{act}</li>
-                ))}
-              </ul>
-            </div>
-          ))
         )}
       </div>
     </div>

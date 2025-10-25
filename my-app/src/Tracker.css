@@ -1,9 +1,9 @@
 /* Container */
 .tracker-container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
   background-color: #f5f6fa;
   color: #333;
@@ -35,12 +35,12 @@
 }
 
 .add-btn {
-  background-color: #4caf50;
+  background-color: #2196f3;
   color: white;
 }
 
 .add-btn:hover {
-  background-color: #45a049;
+  background-color: #1976d2;
 }
 
 .cta-btn {
@@ -85,19 +85,19 @@
 
 .modal input {
   width: 100%;
-  padding: 10px 0px;
+  padding: 10px 12px; /* Maintains internal spacing */
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
   margin-bottom: 20px;
   outline: none;
   transition: border-color 0.3s ease;
+  box-sizing: border-box; /* Ensures padding is included in width */
 }
 
 .modal input:focus {
   border-color: #2196f3;
 }
-
 /* Modal Buttons */
 .modal-actions {
   display: flex;
@@ -114,21 +114,21 @@
 }
 
 .modal-actions button:first-child {
-  background-color: #4caf50;
+  background-color: #2196f3;
   color: white;
 }
 
 .modal-actions button:first-child:hover {
-  background-color: #45a049;
+  background-color: #1976d2;
 }
 
 .modal-actions .cancel {
-  background-color: #f44336;
+  background-color: #2196f3;
   color: white;
 }
 
 .modal-actions .cancel:hover {
-  background-color: #d32f2f;
+  background-color: #1976d2;
 }
 
 /* Cards Container */
@@ -153,12 +153,40 @@
 }
 
 .day-card ul {
-  padding-left: 20px;
+  padding-left: 0; /* Reset padding since we're using custom bullets */
+  list-style-type: none; /* Disable default bullets */
 }
 
-.day-card li {
+/* Task Items - Custom Bullet Fix */
+.task-item {
   margin-bottom: 6px;
   line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+  padding-left: 20px; /* Space for custom bullet */
+}
+
+/* Custom bullet using ::before */
+.task-item::before {
+  content: "•"; /* Unicode bullet character */
+  position: absolute;
+  left: 0;
+  color: #666;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.done-task {
+  opacity: 0.6;
+}
+
+.done-task span,
+.done-task::before {
+  text-decoration: line-through;
+  color: #888;
 }
 
 /* Empty State */
@@ -173,4 +201,9 @@
   width: 160px;
   margin-bottom: 20px;
   opacity: 0.8;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%; /* Ensures the wrapper takes full width */
 }
