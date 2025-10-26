@@ -2,11 +2,50 @@
 .tracker-container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: var(--spacing-xl);
+  font-family: var(--font-sans);
   min-height: 100vh;
-  background-color: #f5f6fa;
-  color: #333;
+  background-color: #f8fafc;
+  color: #1e293b;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root {
+  /* Colors */
+  --primary-color: #0078ff;
+  --primary-600: #0066e6;
+  --primary-700: #0052b8;
+  --primary-soft: #e6f0ff;
+  --success: #10b981;
+  --success-soft: #ecfdf5;
+  --muted: #64748b;
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+
+  /* Typography */
+  --font-sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  /* Effects */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow: 0 8px 24px rgba(2, 6, 23, 0.08);
+  --shadow-lg: 0 12px 32px rgba(2, 6, 23, 0.12);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
 }
 
 /* Header */
@@ -27,54 +66,82 @@
 .cta-btn {
   padding: 10px 18px;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 600;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: 0.3s ease;
+  transition: background-color 0.18s ease, transform 0.12s ease;
+  box-shadow: 0 2px 6px rgba(2, 6, 23, 0.06);
 }
 
 .add-btn {
-  background-color: #2196f3;
+  background-color: var(--primary-color);
   color: white;
 }
 
 .add-btn:hover {
-  background-color: #1976d2;
+  background-color: var(--primary-600);
+  transform: translateY(-1px);
 }
 
 .cta-btn {
-  background-color: #2196f3;
-  color: white;
+  background-color: #e9eefc;
+  color: var(--primary-600);
+  font-weight: 700;
 }
-
 .cta-btn:hover {
-  background-color: #1976d2;
+  background-color: #dce9ff;
 }
 
-/* Modal Overlay */
+.add-btn:focus,
+.cta-btn:focus {
+  outline: 3px solid rgba(0, 120, 255, 0.14);
+}
+
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(15, 23, 42, 0.65);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
 }
 
-/* Modal */
 .modal {
   background-color: white;
-  padding: 25px 30px;
-  border-radius: 12px;
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
   width: 90%;
-  max-width: 400px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  text-align: center;
+  max-width: 440px;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal h2 {
@@ -83,52 +150,81 @@
   color: #333;
 }
 
-.modal input {
-  width: 100%;
-  padding: 10px 12px; /* Maintains internal spacing */
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-bottom: 20px;
-  outline: none;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box; /* Ensures padding is included in width */
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
-.modal input:focus {
-  border-color: #2196f3;
+.modal input,
+.modal select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+  background-color: #fff;
+  box-sizing: border-box;
 }
-/* Modal Buttons */
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
+
+.modal input:focus,
+.modal select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+  outline: none;
+}
+
+.modal input::placeholder {
+  color: var(--muted);
+}
+
+.modal select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+}
+
+.modal input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.modal input[type="number"]::-webkit-outer-spin-button,
+.modal input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .modal-actions button {
-  padding: 8px 20px;
-  font-weight: bold;
-  border-radius: 6px;
+  padding: 10px 18px;
+  font-weight: 600;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: 0.3s ease;
+  transition: background-color 0.18s ease, transform 0.08s ease;
 }
 
 .modal-actions button:first-child {
-  background-color: #2196f3;
+  background-color: var(--primary-color);
   color: white;
 }
-
 .modal-actions button:first-child:hover {
-  background-color: #1976d2;
+  background-color: var(--primary-600);
 }
 
 .modal-actions .cancel {
-  background-color: #2196f3;
-  color: white;
+  background-color: #f0f4ff;
+  color: var(--primary-600);
 }
-
 .modal-actions .cancel:hover {
-  background-color: #1976d2;
+  background-color: #e6efff;
+}
+.modal-actions button:focus {
+  outline: 3px solid rgba(0, 120, 255, 0.12);
 }
 
 /* Cards Container */
@@ -144,7 +240,7 @@
   background-color: #fff;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
 }
 
 .day-card h3 {
@@ -157,36 +253,60 @@
   list-style-type: none; /* Disable default bullets */
 }
 
-/* Task Items - Custom Bullet Fix */
+/* Tasks */
 .task-item {
-  margin-bottom: 6px;
-  line-height: 1.5;
   display: flex;
   align-items: center;
-  gap: 8px;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+  border-radius: var(--radius-md);
+  background-color: #fff;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
   cursor: pointer;
   position: relative;
-  padding-left: 20px; /* Space for custom bullet */
 }
 
-/* Custom bullet using ::before */
-.task-item::before {
-  content: "•"; /* Unicode bullet character */
-  position: absolute;
-  left: 0;
-  color: #666;
-  font-size: 1.2em;
-  font-weight: bold;
+
+
+.task-item:hover {
+  transform: translateY(-1px);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
 .done-task {
-  opacity: 0.6;
+  background-color: var(--success-soft);
 }
 
-.done-task span,
 .done-task::before {
+  background-color: var(--success);
+}
+
+.done-task span {
   text-decoration: line-through;
-  color: #888;
+  color: var(--muted);
+}
+
+/* Habit Meta */
+.task-item em {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 0.75rem;
+  color: var(--muted);
+  background-color: #f1f5f9;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.task-item em::before {
+  content: "•";
+  color: var(--success);
+  font-size: 1.2em;
+  line-height: 0;
 }
 
 /* Empty State */
@@ -206,4 +326,41 @@
 .input-wrapper {
   position: relative;
   width: 100%; /* Ensures the wrapper takes full width */
+}
+
+.welcome-section {
+  text-align: center;
+}
+
+/* Animations */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+.shake {
+  animation: shake 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Responsive tweaks */
+@media (max-width: 520px) {
+  .tracker-container {
+    padding: 14px;
+  }
+  .add-btn,
+  .cta-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .modal {
+    padding: 18px;
+  }
 }

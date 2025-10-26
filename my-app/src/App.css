@@ -11,6 +11,56 @@ html,
   min-height: 100vh;
 }
 
+.welcome-section {
+  background: linear-gradient(to right, #f0f7ff, #ffffff);
+  padding: 1.5rem 2rem;
+  margin: 0 0 2rem;
+  border-bottom: 1px solid rgba(0,120,255,0.1);
+  animation: fadeSlideIn 0.5s ease-out;
+}
+
+.message-banner {
+  background: #e3f2fd;
+  color: #1565c0;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  margin: 1rem auto;
+  max-width: 500px;
+  text-align: center;
+  animation: fadeSlideIn 0.3s ease-out;
+  border: 1px solid rgba(21,101,192,0.1);
+}
+
+.welcome-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.greeting-text {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.today-text {
+  margin: 0.5rem 0 0;
+  font-size: 1.1rem;
+  color: #666;
+  font-weight: 500;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Navbar */
 .navbar {
   display: flex;
