@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Sankalp",
+  "name": "Sankalp Habit Tracker",
+  "description": "Track your habits, routines, and daily progress with Sankalp. Stay motivated and build better habits!",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#0078ff",
+  "background_color": "#f8fafc"
 }

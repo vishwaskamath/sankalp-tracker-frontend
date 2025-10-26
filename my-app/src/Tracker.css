@@ -61,6 +61,22 @@
   gap: 10px;
 }
 
+@media (max-width: 520px) {
+  .header-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    align-items: stretch;
+    margin-top: 10px;
+  }
+  .header-actions button {
+    width: 100%;
+    min-width: 0;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+}
+
 /* Buttons */
 .add-btn,
 .cta-btn {
