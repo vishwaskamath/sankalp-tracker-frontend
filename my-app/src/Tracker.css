@@ -366,6 +366,51 @@
   animation: shake 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
+/* Unsaved changes indicator */
+.unsaved {
+  background-color: #fffbe6 !important;
+  border: 1.5px solid #ffd700 !important;
+  box-shadow: 0 0 0 2px #ffe06633;
+  position: relative;
+}
+.unsaved::after {
+  content: "Unsaved";
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  background: #ffd700;
+  color: #333;
+  font-size: 0.75em;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* Save Progress button styling */
+.save-progress-btn {
+  background-color: #ffd700;
+  color: #333;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.12);
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.save-progress-btn:hover {
+  background-color: #ffe066;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.18);
+}
+.save-progress-btn:disabled {
+  background-color: #f6e9b2;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
 /* Responsive tweaks */
 @media (max-width: 520px) {
   .tracker-container {

@@ -123,6 +123,8 @@ function Tracker({ userId: propUserId }) {
       return new Set();
     }
   });
+  const [pendingChanges, setPendingChanges] = useState({}); // { id: checked }
+  const [saving, setSaving] = useState(false);
 
   // Persist completed items to localStorage whenever they change
   useEffect(() => {
@@ -205,75 +207,43 @@ function Tracker({ userId: propUserId }) {
     }
   }
 
-  async function handleToggleActivity(activityId) {
-    const activity = activities.find((a) => a.activityId === activityId);
-
-    // If already done today, show feedback and prevent toggle
-    if (activity.done && completedToday.has(`activity-${activityId}`)) {
-      // Optional: Add a subtle shake animation to the item
-      const element = document.querySelector(
-        `[data-id="activity-${activityId}"]`
-      );
-      if (element) {
-        element.classList.add("shake");
-        setTimeout(() => element.classList.remove("shake"), 500);
-      }
-      return;
-    }
-
-    try {
-      const data = await gql(TOGGLE_ACTIVITY, { activityId });
-      setActivities((prev) =>
-        prev.map((a) =>
-          a.activityId === activityId ? data.toggleActivityDone : a
-        )
-      );
-
-      // If marked as done, add to completed set
-      if (data.toggleActivityDone.done) {
-        setCompletedToday(
-          (prev) => new Set([...prev, `activity-${activityId}`])
-        );
-      }
-    } catch (err) {
-      console.error("Toggle activity failed", err.message || err);
-    }
+  // New: handle checkbox change locally
+  function handleCheckboxChange(type, id, checked) {
+    setPendingChanges((prev) => ({ ...prev, [`${type}-${id}`]: checked }));
   }
 
-  async function handleToggleHabit(habitId) {
-    const habit = habits.find((h) => h.habitId === habitId);
-    const isCompletedToday = (habit.completions || []).some(
-      (c) => c.date === todayISO
-    );
-
-    // If already completed today, show feedback and prevent toggle
-    if (isCompletedToday && completedToday.has(`habit-${habitId}`)) {
-      // Optional: Add a subtle shake animation to the item
-      const element = document.querySelector(`[data-id="habit-${habitId}"]`);
-      if (element) {
-        element.classList.add("shake");
-        setTimeout(() => element.classList.remove("shake"), 500);
-      }
-      return;
-    }
-
+  // New: Save Progress handler
+  async function handleSaveProgress() {
+    setSaving(true);
     try {
-      const data = await gql(TOGGLE_HABIT, { habitId });
-      setHabits((prev) =>
-        prev.map((h) => (h.habitId === habitId ? data.toggleHabitDone : h))
-      );
-
-      // If completed today (check new completions array)
-      const nowCompletedToday = (data.toggleHabitDone.completions || []).some(
-        (c) => c.date === todayISO
-      );
-
-      if (nowCompletedToday) {
-        setCompletedToday((prev) => new Set([...prev, `habit-${habitId}`]));
+      // For each changed activity/habit, call the toggle mutation if the value differs from backend
+      for (const key in pendingChanges) {
+        const [type, id] = key.split("-");
+        const checked = pendingChanges[key];
+        if (type === "activity") {
+          const activity = activities.find((a) => a.activityId === id);
+          if (activity && !!activity.done !== checked) {
+            await gql(TOGGLE_ACTIVITY, { activityId: id });
+          }
+        } else if (type === "habit") {
+          const habit = habits.find((h) => h.habitId === id);
+          if (habit) {
+            // Only toggle if the checked state differs from backend
+            const doneToday = (habit.completions || []).some(
+              (c) => c.date === todayISO
+            );
+            if (!!doneToday !== checked) {
+              await gql(TOGGLE_HABIT, { habitId: id });
+            }
+          }
+        }
       }
+      setPendingChanges({});
+      await loadData();
     } catch (err) {
-      console.error("Toggle habit failed", err.message || err);
+      alert("Failed to save progress: " + (err.message || err));
     }
+    setSaving(false);
   }
 
   // Build combined list for display: activities (explicit) + habit instances for today
@@ -365,8 +335,16 @@ function Tracker({ userId: propUserId }) {
                 onChange={(e) => setNewHabitText(e.target.value)}
                 placeholder="Habit description"
               />
-              <div className="field-desc" style={{marginBottom: '0.5rem', fontSize: '0.95em', color: '#6b7280'}}>
-                <strong>Recurrence:</strong> How often do you want to repeat this habit? (Daily, Weekly, or Monthly)
+              <div
+                className="field-desc"
+                style={{
+                  marginBottom: "0.5rem",
+                  fontSize: "0.95em",
+                  color: "#6b7280",
+                }}
+              >
+                <strong>Recurrence:</strong> How often do you want to repeat
+                this habit? (Daily, Weekly, or Monthly)
               </div>
               <select
                 value={newHabitRecurrence}
@@ -376,8 +354,16 @@ function Tracker({ userId: propUserId }) {
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
               </select>
-              <div className="field-desc" style={{marginBottom: '0.5rem', fontSize: '0.95em', color: '#6b7280'}}>
-                <strong>Goal:</strong> How many times do you want to complete this habit?
+              <div
+                className="field-desc"
+                style={{
+                  marginBottom: "0.5rem",
+                  fontSize: "0.95em",
+                  color: "#6b7280",
+                }}
+              >
+                <strong>Goal:</strong> How many times do you want to complete
+                this habit?
               </div>
               <input
                 type="number"
@@ -404,45 +390,90 @@ function Tracker({ userId: propUserId }) {
         <div className="day-card">
           <h3>{todayISO}</h3>
           <ul>
-            {activities.map((act) => (
-              <li
-                key={act.activityId}
-                data-id={`activity-${act.activityId}`}
-                className={`task-item ${act.done ? "done-task" : ""}`}
-              >
-                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', width: '100%' }}>
-                  <input
-                    type="checkbox"
-                    checked={!!act.done}
-                    onChange={() => handleToggleActivity(act.activityId)}
-                    style={{ marginRight: '0.7em', accentColor: '#0078ff' }}
-                  />
-                  <span>{act.text}</span>
-                </label>
-              </li>
-            ))}
-            {habitInstances.map((h) => (
-              <li
-                key={h.habitId}
-                data-id={`habit-${h.habitId}`}
-                className={`task-item ${h.done ? "done-task" : ""}`}
-              >
-                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', width: '100%' }}>
-                  <input
-                    type="checkbox"
-                    checked={!!h.done}
-                    onChange={() => handleToggleHabit(h.habitId)}
-                    style={{ marginRight: '0.7em', accentColor: '#0078ff' }}
-                  />
-                  <span>
-                    {h.text}
-                    <em style={{ fontSize: "0.8em", marginLeft: 8 }}>
-                      (Habit • {h.progress}% Complete • Streak: {h.streak} 🔥)
-                    </em>
-                  </span>
-                </label>
-              </li>
-            ))}
+            {activities.map((act) => {
+              const changed = pendingChanges[`activity-${act.activityId}`];
+              const checked =
+                typeof changed === "boolean" ? changed : !!act.done;
+              return (
+                <li
+                  key={act.activityId}
+                  data-id={`activity-${act.activityId}`}
+                  className={`task-item ${checked ? "done-task" : ""} ${
+                    typeof changed === "boolean" ? "unsaved" : ""
+                  }`}
+                >
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                      width: "100%",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) =>
+                        handleCheckboxChange(
+                          "activity",
+                          act.activityId,
+                          e.target.checked
+                        )
+                      }
+                      style={{ marginRight: "0.7em", accentColor: "#0078ff" }}
+                    />
+                    <span>{act.text}</span>
+                  </label>
+                </li>
+              );
+            })}
+            {habitInstances.map((h) => {
+              const changed = pendingChanges[`habit-${h.habitId}`];
+              // Always allow toggling both ways in local state
+              let checked;
+              if (typeof changed === "boolean") {
+                checked = changed;
+              } else {
+                checked = !!h.done;
+              }
+              return (
+                <li
+                  key={h.habitId}
+                  data-id={`habit-${h.habitId}`}
+                  className={`task-item ${checked ? "done-task" : ""} ${
+                    typeof changed === "boolean" ? "unsaved" : ""
+                  }`}
+                >
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                      width: "100%",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) =>
+                        handleCheckboxChange(
+                          "habit",
+                          h.habitId,
+                          e.target.checked
+                        )
+                      }
+                      style={{ marginRight: "0.7em", accentColor: "#0078ff" }}
+                    />
+                    <span>
+                      {h.text}
+                      <em style={{ fontSize: "0.8em", marginLeft: 8 }}>
+                        (Habit • {h.progress}% Complete • Streak: {h.streak} 🔥)
+                      </em>
+                    </span>
+                  </label>
+                </li>
+              );
+            })}
             {activities.length === 0 && habitInstances.length === 0 && (
               <div className="empty-state">
                 <p>No activities or habits for today.</p>
@@ -453,6 +484,18 @@ function Tracker({ userId: propUserId }) {
               </div>
             )}
           </ul>
+          {/* Save Progress Button */}
+          {Object.keys(pendingChanges).length > 0 && (
+            <div style={{ margin: "16px 0", textAlign: "right" }}>
+              <button
+                className="save-progress-btn"
+                onClick={handleSaveProgress}
+                disabled={saving}
+              >
+                {saving ? "Saving..." : "Save Progress"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
